@@ -1,0 +1,16 @@
+{
+  "name": "SunSpy — sun planner",
+  "short_name": "SunSpy",
+  "description": "Where the sun will be: direction, altitude, shadows, golden and blue hour for photo and video shoots",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#14111f",
+  "theme_color": "#14111f",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

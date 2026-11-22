@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
+  <meta name="theme-color" content="#14111f" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="SunSpy" />
+  <meta name="description" content="Где будет солнце: направление, высота, тени, золотой и синий час для фото и видеосъёмки" />
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" />
+  <link rel="icon" type="image/png" href="./icons/icon-192.png" />
+  <title>SunSpy</title>
+</head>
+<body>
+  <div id="map"></div>
+
+  <header id="top">
+    <div class="search">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input id="q" type="search" data-tp="searchPh" autocomplete="off" autocorrect="off" spellcheck="false" enterkeyhint="search" />
+      <button id="q-clear" class="icon-btn" hidden aria-label="Clear">✕</button>
+    </div>
+    <ul id="results" hidden></ul>
+  </header>
+
+  <div class="fab-col right" id="fabs">
+    <button class="fab" id="btn-layers" data-ta="layers">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="m12 3 9 5-9 5-9-5z"/><path d="m3 13 9 5 9-5"/></svg>
+    </button>
+    <button class="fab" id="btn-tilt" aria-label="3D">
+      <span class="fab-txt">3D</span>
+    </button>
+    <button class="fab" id="btn-locate" data-ta="locate">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M20 4 4 11l7 2 2 7z"/></svg>
+    </button>
+    <button class="fab" id="btn-spots" data-ta="spots">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M6 3h12v18l-6-4-6 4z"/></svg>
+    </button>
+    <button class="fab accent" id="btn-ar" data-ta="ar">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>
+    </button>
+    <button class="fab" id="btn-share" data-ta="share">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 8l5-5 5 5"/><path d="M5 13v7h14v-7"/></svg>
+    </button>
+  </div>
+  <button class="fab small" id="btn-north" hidden aria-label="North"><svg viewBox="0 0 24 24"><path d="M12 3 16 13H8z" fill="#ff5a5a"/><path d="M12 21 8 13h8z" fill="currentColor" opacity=".55"/></svg></button>
+
+  <div id="toast" hidden></div>
+
+  <section id="sheet">
+    <button class="handle" id="sheet-toggle" aria-label="More"><span></span></button>
+    <div class="date-row">
+      <button class="icon-btn" id="d-prev" aria-label="Previous day">‹</button>
+      <label class="date-btn"><span id="d-label"></span><input type="date" id="d-input" /></label>
+      <button class="icon-btn" id="d-next" aria-label="Next day">›</button>
+      <button class="pill" id="btn-now" data-t="now"></button>
+    </div>
+    <div class="time-row">
+      <div class="clock">
+        <b id="clock">12:00</b>
+        <span id="phase-label" class="phase"></span>
+      </div>
+      <div class="tzinfo" id="tzinfo"></div>
+      <button class="round" id="btn-play" data-ta="play"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z" fill="currentColor"/></svg></button>
+    </div>
+    <canvas id="timeline"></canvas>
+    <div class="chips" id="chips"></div>
+    <div class="stats">
+      <div><b id="s-az">—</b><span data-t="az"></span></div>
+      <div><b id="s-alt">—</b><span data-t="alt"></span></div>
+      <div><b id="s-shadow">—</b><span data-t="shadow"></span></div>
+      <div><b id="s-moon">—</b><span data-t="moon"></span></div>
+    </div>
+    <div class="details">
+      <div class="obj-row">
+        <span data-t="objHeight"></span>
+        <div class="obj-input"><input id="obj-h" type="number" inputmode="decimal" min="0" step="0.1" /><small id="obj-unit">м</small></div>
+        <b id="obj-shadow"></b>
+      </div>
+      <button class="primary" id="btn-save"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M6 3h12v18l-6-4-6 4z"/></svg><span data-t="savePoint"></span></button>
+      <div id="horizon-status" hidden></div>
+      <h3 data-t="events"></h3>
+      <ul id="events"></ul>
+      <div id="moon-info"></div>
+      <p class="coords" id="coords"></p>
+    </div>
+  </section>
+
+  <dialog id="dlg-layers" class="sheet-dlg">
+    <header><h2 data-t="layers"></h2><button class="icon-btn" value="close" data-close>✕</button></header>
+    <div class="seg-label" data-t="mapStyle"></div>
+    <div class="seg" id="seg-style"><button data-v="map" data-t="styleMap"></button><button data-v="sat" data-t="styleSat"></button></div>
+    <label class="switch-row"><span data-t="buildings3d"></span><input type="checkbox" id="opt-3d" /></label>
+    <label class="switch-row"><span><span data-t="bshadows"></span><small data-t="bshadowsHint"></small></span><input type="checkbox" id="opt-bshadows" /></label>
+    <label class="switch-row"><span data-t="terrain"></span><input type="checkbox" id="opt-terrain" /></label>
+    <label class="switch-row"><span><span data-t="horizonCalc"></span><small data-t="horizonHint"></small></span><input type="checkbox" id="opt-horizon" /></label>
+    <label class="switch-row"><span data-t="showMoon"></span><input type="checkbox" id="opt-moon" /></label>
+    <div class="seg-label" data-t="units"></div>
+    <div class="seg" id="seg-units"><button data-v="m">m</button><button data-v="ft">ft</button></div>
+    <div class="seg-label" data-t="lang"></div>
+    <div class="seg" id="seg-lang"><button data-v="ru">Русский</button><button data-v="en">English</button></div>
+    <ul class="legend">
+      <li><i style="background:#ffd23f"></i><span data-t="l-sun"></span></li>
+      <li><i style="background:#ff9a3c"></i><span data-t="l-rise"></span></li>
+      <li><i style="background:#ff4f5e"></i><span data-t="l-set"></span></li>
+      <li><i style="background:#a9c7ff"></i><span data-t="l-moon"></span></li>
+      <li><i style="background:#1b1f3a;border:1px solid #fff4"></i><span data-t="l-shadow"></span></li>
+    </ul>
+    <p class="build">SunSpy · <span id="build"></span></p>
+  </dialog>
+
+  <dialog id="dlg-spots" class="sheet-dlg">
+    <header><h2 data-t="spots"></h2><button class="icon-btn" data-close>✕</button></header>
+    <ul id="spot-list"></ul>
+  </dialog>
+
+  <dialog id="dlg-prompt" class="mini-dlg">
+    <form method="dialog">
+      <h3 id="prompt-title"></h3>
+      <input id="prompt-input" type="text" autocomplete="off" />
+      <div class="dlg-actions"><button value="cancel" class="ghost">✕</button><button value="ok" class="primary" id="prompt-ok">OK</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="dlg-confirm" class="mini-dlg">
+    <form method="dialog">
+      <h3 id="confirm-title"></h3>
+      <div class="dlg-actions"><button value="cancel" class="ghost">✕</button><button value="ok" class="danger" data-t="del"></button></div>
+    </form>
+  </dialog>
+
+  <div id="ar" hidden>
+    <video playsinline muted autoplay></video>
+    <canvas></canvas>
+    <div class="ar-top">
+      <button class="fab" id="ar-close" aria-label="Close">✕</button>
+      <div class="ar-heading"></div>
+      <button class="fab" id="ar-reset" aria-label="Reset compass offset">⟲</button>
+    </div>
+    <div class="ar-bottom">
+      <span data-t="arHint"></span>
+      <label><span data-t="arFov"></span><input type="range" id="ar-fov" min="40" max="100" step="1" /></label>
+    </div>
+  </div>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>
