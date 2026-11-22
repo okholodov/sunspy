@@ -15,7 +15,7 @@ const S = {
   lat: saved.lat ?? 55.7525, lng: saved.lng ?? 37.6231, zoom: saved.zoom ?? 15.5,
   style: saved.style ?? 'map', buildings3d: saved.buildings3d ?? true, bshadows: saved.bshadows ?? true,
   terrain: saved.terrain ?? false, horizonOn: saved.horizonOn ?? false, showMoon: saved.showMoon ?? true,
-  units: saved.units ?? (getLang() === 'en' && /US/.test(navigator.language) ? 'ft' : 'm'), objH: saved.objH ?? 1.8,
+  units: saved.units ?? (/-US/i.test(navigator.language) ? 'ft' : 'm'), objH: saved.objH ?? 1.8,
   tz: 'UTC', date: '', t: Date.now(), live: true,
   day: null, samples: [], moonSamples: [], horizon: null,
 };

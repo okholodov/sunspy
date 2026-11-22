@@ -151,12 +151,12 @@ const STR = {
   },
 };
 
-let lang = 'ru';
-try { lang = localStorage.getItem('sunspy.lang') || ((navigator.language || 'ru').toLowerCase().startsWith('ru') ? 'ru' : 'en'); } catch { /* private mode */ }
+let lang = 'en';
+try { lang = localStorage.getItem('sunspy.lang.v2') || 'en'; } catch { /* private mode */ }
 if (!STR[lang]) lang = 'en';
 
 export const getLang = () => lang;
-export function setLang(l) { lang = l; try { localStorage.setItem('sunspy.lang', l); } catch { /* ignore */ } }
+export function setLang(l) { lang = l; try { localStorage.setItem('sunspy.lang.v2', l); } catch { /* ignore */ } }
 export const t = (k) => STR[lang][k] ?? STR.en[k] ?? k;
 export const cardinal = (az) => STR[lang].cardinal[Math.round(az / 22.5) % 16];
 
